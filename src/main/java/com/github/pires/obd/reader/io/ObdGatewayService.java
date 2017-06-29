@@ -9,9 +9,11 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
+import android.os.Handler;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.github.pires.obd.commands.SpeedCommand;
 import com.github.pires.obd.commands.engine.RPMCommand;
 import com.github.pires.obd.commands.pressure.IntakeManifoldPressureCommand;
 import com.github.pires.obd.commands.protocol.EchoOffCommand;
@@ -104,7 +106,7 @@ public class ObdGatewayService extends AbstractGatewayService {
             showNotification(getString(R.string.notification_action), getString(R.string.service_started), R.drawable.ic_btcar, true, true, false);
         }
     }
-
+Handler handler;
     /**
      * Start and configure the connection to the OBD interface.
      * <p/>
@@ -127,12 +129,24 @@ public class ObdGatewayService extends AbstractGatewayService {
         Log.d(TAG, "Queueing jobs for connection configuration..");
 //        queueJob(new ObdCommandJob(new ObdResetCommand()));
 //        queueJob(new ObdCommandJob(new EngineCoolantTemperatureCommand()));
-        queueJob(new ObdCommandJob(new IntakeManifoldPressureCommand()));
+        handler=new Handler();
+        handler.post(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                queueJob(new ObdCommandJob(new IntakeManifoldPressureCommand()));
 
-        //Below is to give the adapter enough time to reset before sending the commands, otherwise the first startup commands could be ignored.
-        try { Thread.sleep(500); } catch (InterruptedException e) { e.printStackTrace(); }
-        queueJob(new ObdCommandJob(new RPMCommand()));
-//        queueJob(new ObdCommandJob(new EchoOffCommand()));
+                //Below is to give the adapter enough time to reset before sending the commands, otherwise the first startup commands could be ignored.
+                try { Thread.sleep(500); } catch (InterruptedException e) { e.printStackTrace(); }
+                queueJob(new ObdCommandJob(new RPMCommand()));
+                try { Thread.sleep(500); } catch (InterruptedException e) { e.printStackTrace(); }
+                queueJob(new ObdCommandJob(new SpeedCommand()));
+                handler.postDelayed(this,2000);
+
+            }
+        });
+
 
     /*
      * Will send second-time based on tests.

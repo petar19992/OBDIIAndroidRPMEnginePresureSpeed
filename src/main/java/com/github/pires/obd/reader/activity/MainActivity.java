@@ -515,8 +515,8 @@ public class MainActivity extends RoboActivity implements ObdProgressListener, L
     {
         menu.add(0, START_LIVE_DATA, 0, getString(R.string.menu_start_live_data));
         menu.add(0, STOP_LIVE_DATA, 0, getString(R.string.menu_stop_live_data));
-        menu.add(0, GET_DTC, 0, getString(R.string.menu_get_dtc));
-        menu.add(0, TRIPS_LIST, 0, getString(R.string.menu_trip_list));
+        /*menu.add(0, GET_DTC, 0, getString(R.string.menu_get_dtc));
+        menu.add(0, TRIPS_LIST, 0, getString(R.string.menu_trip_list));*/
         menu.add(0, SETTINGS, 0, getString(R.string.menu_settings));
         return true;
     }
@@ -682,16 +682,20 @@ public class MainActivity extends RoboActivity implements ObdProgressListener, L
 
         if (service != null && service.isRunning())
         {
+            if(getDTCItem!=null)
             getDTCItem.setEnabled(false);
             startItem.setEnabled(false);
             stopItem.setEnabled(true);
+            if(settingsItem!=null)
             settingsItem.setEnabled(false);
         }
         else
         {
+            if(getDTCItem!=null)
             getDTCItem.setEnabled(true);
             stopItem.setEnabled(false);
             startItem.setEnabled(true);
+            if(settingsItem!=null)
             settingsItem.setEnabled(true);
         }
 
